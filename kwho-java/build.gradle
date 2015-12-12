@@ -60,6 +60,7 @@ dependencies {
  * 
  */
 task fatCapsule(type: FatCapsule) {
+    description = "Creates a capsule containing all required dependencies."
     applicationClass mainClassName
 }
 
@@ -67,6 +68,7 @@ task fatCapsule(type: FatCapsule) {
 // #!/bin/sh
 // exec java -jar "$0" "$@"
 task executableCapsule(type: FatCapsule){
+    description = "Creates a fatCapsule, and wraps it in a shell script."
     applicationClass mainClassName
     reallyExecutable { regular() }
 }
