@@ -33,6 +33,21 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+/*
+ * I'd like to have a task for creating a "basic" start script,
+ * but I'm having trouble getting it to work.
+ * 
+ * // https://docs.gradle.org/current/userguide/application_plugin.html
+ * // https://docs.gradle.org/current/dsl/org.gradle.jvm.application.tasks.CreateStartScripts.html
+ * task createStartScripts(type: CreateStartScripts) {
+ *   outputDir = file('build/sample')
+ *   mainClassName = 'kwho'
+ *   applicationName = 'kwho'
+ *   classpath = files('path/to/some.jar')
+ * }
+ */
+
+
 /* 
  * gradlew fatCapsule
  * A "fat capsule" contains all the needed jars, and
