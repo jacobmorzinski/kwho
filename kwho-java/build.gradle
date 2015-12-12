@@ -6,10 +6,21 @@ plugins {
     id "us.kirchmeier.capsule" version "1.0.1"
 }
 
+plugins {
+  id 'java' // or 'groovy' Must be explicitly applied
+  id 'com.github.johnrengelman.shadow' version '1.2.2'
+  // creates tasks: shadowJar, knows
+}
+
 apply plugin: 'java'
 
 apply plugin: 'application'
 mainClassName = 'kwho'
+
+task wrapper(type: Wrapper) {
+    description = "Updates gradlew and supporting files."
+    gradleVersion = '2.9'
+}
 
 repositories {
     // You can declare any Maven/Ivy/file repository here.
@@ -37,6 +48,7 @@ task fatCapsule(type: FatCapsule) {
     applicationClass mainClassName
 }
 
+// Prepends onto the jar:
 // #!/bin/sh
 // exec java -jar "$0" "$@"
 task executableCapsule(type: FatCapsule){
