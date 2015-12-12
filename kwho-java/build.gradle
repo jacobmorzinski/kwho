@@ -1,5 +1,11 @@
 // vim:shiftwidth=4:tabstop=4:expandtab:filetype=groovy
 
+plugins {
+    // http://www.capsule.io/user-guide/
+    // https://github.com/danthegoodman/gradle-capsule-plugin
+    id "us.kirchmeier.capsule" version "1.0.1"
+}
+
 apply plugin: 'java'
 
 apply plugin: 'application'
@@ -16,3 +22,24 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+/* 
+ * gradlew fatCapsule
+ * A "fat capsule" contains all the needed jars, and
+ * will unpack them into the user's personal capsule directory.
+ * 
+ * View the capsule help with:
+ * java "-Dcapsule.help" -jar build/libs/kwho-java-capsule.jar
+ * Force reinstalling, and view logging, with:
+ * java "-Dcapsule.reset=true" "-Dcapsule.log=verbose"  -jar build/libs/kwho-java-capsule.jar
+ * 
+ */
+task fatCapsule(type: FatCapsule) {
+    applicationClass mainClassName
+}
+
+// #!/bin/sh
+// exec java -jar "$0" "$@"
+task executableCapsule(type: FatCapsule){
+    applicationClass mainClassName
+    reallyExecutable { regular() }
+}
