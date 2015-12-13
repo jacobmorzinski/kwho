@@ -8,11 +8,6 @@
         [sun.security.krb5.internal.ccache FileCredentialsCache])
 
 
-(defn -main
-  "Handle any commandline invocation logic."
-  [& args]
-  (println (get_principal)))
-
 (defn get_principal
   "Get principal from $KRB5CCNAME - assumes it is type FILE:"
   []
@@ -23,4 +18,9 @@
        (.getNameStrings)
        (str/join "/")))
 
+
+(defn -main
+  "Handle any commandline invocation logic."
+  [& args]
+  (println (get_principal)))
 

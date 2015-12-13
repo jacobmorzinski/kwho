@@ -4,9 +4,7 @@ A Clojure version of "kwho"
 
 ## Usage
 
-FIXME: explanation
-
-    $ java -jar kwho-0.1.0-standalone.jar [args]
+    $ java -jar ./target/uberjar/kwho-0.1.0-SNAPSHOT-standalone.jar
 
 ## License
 
