@@ -22,5 +22,6 @@
 (defn -main
   "Handle any commandline invocation logic."
   [& args]
+  (println "Args: " (apply str (interpose ", " args)))
   (println (get_principal)))
 
