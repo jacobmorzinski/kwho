@@ -11,12 +11,16 @@
 (defn get_principal
   "Get principal from $KRB5CCNAME - assumes it is type FILE:"
   []
-  (->> (System/getenv "KRB5CCNAME")
-       (#(str/replace % #"^FILE:" ""))
-       (FileCredentialsCache/acquireInstance nil)
-       (.getPrimaryPrincipal)
-       (.getNameStrings)
-       (str/join "/")))
+  (if-some [krb5ccname (System/getenv "KRB5CCNAME")]
+    (let [cachefile (str/replace krb5ccname #"^FILE:" "")]
+      (if-some [fcc (FileCredentialsCache/acquireInstance nil cachefile)]
+        (->> fcc
+            (.getPrimaryPrincipal)
+            (.getNameStrings)
+            (str/join "/"))
+        (format "No credentials cache found (ticket cache FILE:%s)"
+                cachefile)))
+    "Uh-oh, KRB5CCNAME is not set.  Quitting."))
 
 
 (defn -main
