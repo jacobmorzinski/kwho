@@ -4,11 +4,11 @@ A Java version of `kwho`
 
 ## Usage
 
-    $ gradlew run
+    $ ./gradlew run
 
 or
 
-    $ gradlew shadowJar
+    $ ./gradlew shadowJar
     $ java -jar ./build/libs/kwho-java-all.jar
 
 ## License
