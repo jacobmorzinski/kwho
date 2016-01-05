@@ -1,6 +1,4 @@
-/**
- * Created by Jacob on 1/4/2016.
- */
+package demo
 
 import sun.security.krb5.PrincipalName;
 import sun.security.krb5.internal.ccache.FileCredentialsCache;
