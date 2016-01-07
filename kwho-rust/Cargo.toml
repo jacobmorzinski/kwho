@@ -1,0 +1,13 @@
+[package]
+name = "kwho"
+version = "0.1.0"
+authors = ["Jacob Morzinski <jmorzins@mit.edu>"]
+
+# http://doc.crates.io/build-script.html
+# links = "snappy"
+# build = "build.rs"
+
+[dependencies]
+getopts = "0.2"
+lazy_static = "0.1"
+libc = "0.1"
