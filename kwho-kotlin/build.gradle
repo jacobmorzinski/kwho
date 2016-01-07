@@ -1,14 +1,21 @@
+// vim:shiftwidth=4:tabstop=4:expandtab:filetype=groovy
+
 buildscript {
-  ext.kotlin_version = '1.0.0-beta-4584'
-  repositories {
-    mavenCentral()
-    maven {
-      url 'http://oss.sonatype.org/content/repositories/snapshots'
+    ext.kotlin_version = '1.0.0-beta-4584'
+    repositories {
+        mavenCentral()
+        maven {
+            url 'http://oss.sonatype.org/content/repositories/snapshots'
+        }
     }
-  }
-  dependencies {
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-  }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+// creates tasks including: shadowJar, installShadowApp
+plugins {
+    id 'com.github.johnrengelman.shadow' version '1.2.2'
 }
 
 apply plugin: 'kotlin'
@@ -19,10 +26,10 @@ mainClassName = 'demo.KwhoKt'
 defaultTasks 'run'
 
 repositories {
-  mavenCentral()
-  maven {
-    url 'http://oss.sonatype.org/content/repositories/snapshots'
-  }
+    mavenCentral()
+    maven {
+        url 'http://oss.sonatype.org/content/repositories/snapshots'
+    }
 }
 
 // If you import this Gradle project into IntelliJ IDEA, it should
@@ -31,18 +38,19 @@ repositories {
 // while it synchronizes.
 
 dependencies {
-  compile 'com.google.guava:guava:18.0'
-  compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  testCompile 'junit:junit:4.11'
-  testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+    compile 'com.google.guava:guava:18.0'
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    testCompile 'junit:junit:4.11'
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = "2.7"
-  // The default distributionUrl is:
-  // http://services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip
-  //
-  // By changing to the "all", distribution, IDEs have access to source code
-  // to help with code completion.
-  distributionUrl="https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
+    description = "Updates gradlew and supporting files."
+    gradleVersion = "2.7"
+    // The default distributionUrl is:
+    // http://services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip
+    //
+    // By changing to the "all", distribution, IDEs have access to 
+    // source code to help with code completion.
+    distributionUrl="https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }

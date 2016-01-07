@@ -6,6 +6,11 @@ A Kotlin version of `kwho`
 
     $ ./gradlew run
 
+or
+
+    $ ./gradlew shadowJar
+    $ java -jar build/libs/kwho-kotlin-all.jar
+
 ## License
 
 Copyright © 2015 Jacob Morzinski
