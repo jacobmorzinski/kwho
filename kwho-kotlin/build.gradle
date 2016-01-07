@@ -25,13 +25,24 @@ repositories {
   }
 }
 
+// If you import this Gradle project into IntelliJ IDEA, it should
+// correctly detect these dependencies and add them as libraries.
+// But you may need to wait a few minutes the very first time,
+// while it synchronizes.
+
 dependencies {
   compile 'com.google.guava:guava:18.0'
   compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   testCompile 'junit:junit:4.11'
-  testCompile 'org.jetbrains.kotlin:kotlin-test-junit:0.1-SNAPSHOT'
+  testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 }
 
 task wrapper(type: Wrapper) {
   gradleVersion = "2.7"
+  // The default distributionUrl is:
+  // http://services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip
+  //
+  // By changing to the "all", distribution, IDEs have access to source code
+  // to help with code completion.
+  distributionUrl="https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }

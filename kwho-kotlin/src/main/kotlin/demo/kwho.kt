@@ -2,7 +2,9 @@ package demo
 
 import sun.security.krb5.PrincipalName;
 import sun.security.krb5.internal.ccache.FileCredentialsCache;
+import kotlin.collections.joinToString
 import kotlin.text.Regex
+import kotlin.text.replace
 
 fun main(args: Array<String>) {
     var cache: String? = System.getenv("KRB5CCNAME")
