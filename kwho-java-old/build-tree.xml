@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+
+<!-- From http://access1.sun.com/techarticles/Ant.html -->
+
+<!--  A suggested directory layout is:       -->
+<!--    project/                             -->
+<!--       build.xml                         -->
+<!--       src/                              -->
+<!--          edu/                           -->
+<!--             example/                    -->
+<!--                myPackage/               -->
+<!--                   Main.java             -->
+<!--       build/                            -->
+<!--          classes/                       -->
+<!--             edu/                        -->
+<!--                example/                 -->
+<!--                   myPackage/            -->
+<!--                      Main.class         -->
+<!--       dist/                             -->
+<!--          project.jar                    -->
+
+<!-- The build and dist directories are auto-created -->
+
+<!-- build.xml - A simple Ant build file     -->
+<!-- Note - No DTD                           -->
+<!-- Note - Named build file                 -->
+<!-- Note - Multiple targets                 -->
+
+<project name="kwho" default="execute">
+
+    <!-- Note - Set up build file properties              -->
+    <property name="jarfile" value="kwho.jar" />
+    <property name="manifest" value="kwho.manifest" />
+    <property name="build.classes" value="build/classes" />
+    <property name="build" value="build" />
+    <property name="dist" value="dist" />
+    <property name="src" value="src" />
+    
+    <property name="build.nodebug" value="no" />
+    <property name="build.debug" value="yes" />
+    <property name="build.deprecation" value="on" />
+
+    <property name="build.source" value="1.2" />
+    <property name="build.target" value="1.2" />
+
+    <description>
+        Compiles and runs the "kwho" utility.
+    </description>
+    
+    <!-- Note - Target to initialize the project -->
+    <target name="initialize" description="Initializes the project by creating temporary directories" >
+        <mkdir dir="${build.classes}" />
+        <mkdir dir="${dist}" />
+    </target>
+    
+    <!-- Note - Target to compile the project source    -->
+    <target name="compile" depends="initialize" description="Compile the project source code" >
+        <javac srcdir="${src}" 
+            destdir="${build.classes}"
+            debug="${build.nodebug}"
+            deprecation="${build.deprecation}"
+	    source="${build.source}"
+	    target="${build.target}">
+	        <include name="**/*.java" />
+            </javac>
+    </target>
+    
+    
+    <!-- Note - Target to execute the archived jar    -->
+    <target name="execute" depends="archive" description="Executes the archived jar" >
+        <echo level="warning" message="running"/>
+        <java 
+            jar="${dist}/${jarfile}"
+            classpath="${dist}"
+            failonerror="true"
+            fork="true"
+            />
+    </target>
+    
+    <!-- Note - Target to archive the compiled classes  -->
+    <!-- Note - Also provides a manifest file           -->
+    <target name="archive" depends="compile" description="Archives the compiled classes" >
+        <jar destfile="${dist}/${jarfile}"
+            manifest="${manifest}"
+            basedir="${build.classes}"
+            />
+    </target>
+    
+    <!-- Note - Target to re-initialize the project  -->
+    <target name="cleanUp" depends="initialize" description="Re-initializes the project by removing temporary directories" >
+        <delete dir="${build}" />
+        <delete dir="${dist}" />
+    </target>
+</project>

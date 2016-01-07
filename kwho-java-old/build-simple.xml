@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- From http://access1.sun.com/techarticles/Ant.html -->
+
+<!-- build.xml - A simple Ant build file -->
+<!-- Note - No DTD                       -->
+<!-- Note - Named build file             -->
+
+<project name="kwho" default="compile">
+
+    <!-- Note - Single target          -->
+    <target name="compile">
+        <javac srcdir="." />
+        <echo>Compilation Complete!!</echo>
+    </target>
+</project>
+
