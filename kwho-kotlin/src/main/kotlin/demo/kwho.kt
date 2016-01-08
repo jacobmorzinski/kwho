@@ -12,7 +12,6 @@ fun main(args: Array<String>) {
     cache = cache?.replace(Regex("^FILE:"), "")
     val fcc: FileCredentialsCache? = FileCredentialsCache.acquireInstance(null, cache)
     if (fcc == null) {
-        println("No credentials cache found (ticket cache FILE:$cache)")
         return
     }
     val princ: PrincipalName = fcc.primaryPrincipal
