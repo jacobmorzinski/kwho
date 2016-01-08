@@ -13,7 +13,7 @@ public class kwho {
         }
 
         // The FileCredentialsCache does not want to see the "FILE:" prefix
-        cache = cache.replaceAll("^FILE:", cache);
+        cache = cache.replaceAll("^FILE:", "");
 
         //assumes credendials cache of type "FILE:"
         FileCredentialsCache fcc = FileCredentialsCache.acquireInstance(null, cache);
