@@ -38,7 +38,6 @@ repositories {
 // while it synchronizes.
 
 dependencies {
-    compile 'com.google.guava:guava:18.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testCompile 'junit:junit:4.11'
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
@@ -46,7 +45,7 @@ dependencies {
 
 task wrapper(type: Wrapper) {
     description = "Updates gradlew and supporting files."
-    gradleVersion = "2.7"
+    gradleVersion = "2.9"
     // The default distributionUrl is:
     // http://services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip
     //
