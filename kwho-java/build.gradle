@@ -21,6 +21,12 @@ mainClassName = 'kwho'
 task wrapper(type: Wrapper) {
     description = "Updates gradlew and supporting files."
     gradleVersion = '2.9'
+    // The default distributionUrl is:
+    // http://services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip
+    //
+    // By changing to the "all", distribution, IDEs have access to
+    // source code to help with code completion.
+    distributionUrl="https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
 
 repositories {
