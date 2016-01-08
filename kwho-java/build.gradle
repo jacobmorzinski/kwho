@@ -1,11 +1,5 @@
 // vim:shiftwidth=4:tabstop=4:expandtab:filetype=groovy
 
-plugins {
-    // http://www.capsule.io/user-guide/
-    // https://github.com/danthegoodman/gradle-capsule-plugin
-    id "us.kirchmeier.capsule" version "1.0.1"
-}
-
 // creates tasks including: shadowJar, installShadowApp
 plugins {
     id 'java' // or 'groovy' Must be explicitly applied
@@ -18,17 +12,6 @@ apply plugin: 'java'
 apply plugin: 'application'
 mainClassName = 'kwho'
 
-task wrapper(type: Wrapper) {
-    description = "Updates gradlew and supporting files."
-    gradleVersion = '2.9'
-    // The default distributionUrl is:
-    // http://services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip
-    //
-    // By changing to the "all", distribution, IDEs have access to
-    // source code to help with code completion.
-    distributionUrl="https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
-}
-
 repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
@@ -40,28 +23,13 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-
-/* 
- * gradlew fatCapsule
- * A "fat capsule" contains all the needed jars, and
- * will unpack them into the user's personal capsule directory.
- * 
- * View the capsule help with:
- * java "-Dcapsule.help" -jar build/libs/kwho-java-capsule.jar
- * Force reinstalling, and view logging, with:
- * java "-Dcapsule.reset=true" "-Dcapsule.log=verbose"  -jar build/libs/kwho-java-capsule.jar
- * 
- */
-task fatCapsule(type: FatCapsule) {
-    description = "Creates a capsule containing all required dependencies."
-    applicationClass mainClassName
-}
-
-// Prepends onto the jar:
-// #!/bin/sh
-// exec java -jar "$0" "$@"
-task executableCapsule(type: FatCapsule){
-    description = "Creates a fatCapsule, and wraps it in a shell script."
-    applicationClass mainClassName
-    reallyExecutable { regular() }
+task wrapper(type: Wrapper) {
+    description = "Updates gradlew and supporting files."
+    gradleVersion = '2.9'
+    // The default distributionUrl is:
+    // http://services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip
+    //
+    // By changing to the "all", distribution, IDEs have access to
+    // source code to help with code completion.
+    distributionUrl="https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
