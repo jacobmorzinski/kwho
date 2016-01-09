@@ -7,6 +7,7 @@ use getopts::Options;
 use std::env;
 use std::io::{self,Write};
 use std::process;
+use std::ptr;
 
 // https://doc.rust-lang.org/1.0.0/book/ffi.html
 extern crate libc;
@@ -18,24 +19,28 @@ pub mod ffi {
     pub type krb5_int32 = int32_t;
     pub type krb5_error_code = krb5_int32;
 
-    pub enum krb5_context {}            // internal/opaque
+    pub enum _krb5_context {}            // internal/opaque
 
     #[link(name="krb5")]
     extern "C" {
-        pub fn krb5_init_context(context: *mut krb5_context) -> krb5_error_code;
+        pub fn krb5_init_context(context: *mut _krb5_context) -> krb5_error_code;
     }
 }
 
 #[derive(Debug)]
+#[allow(raw_pointer_derive)]     // TODO: fix
 pub struct Krb5Context {
-    ptr: *mut ffi::krb5_context,
+    ctx: *mut ffi::_krb5_context
 }
 
 impl Krb5Context {
     pub fn new() -> Krb5Context {
         Krb5Context {
-            "need to figure out how to pass a pointer to krb5_init_context "
+            ctx: ptr::null_mut(),
         }
+    }
+    pub fn krb5_init_context(&self) {
+        unsafe { ffi::krb5_init_context(self.ctx); }
     }
 }
 
@@ -102,6 +107,8 @@ fn main() {
         println!("ccache is {}", ccache.clone().unwrap());
     }
 
-    let kcontext = Krb5Context::new();
-    println!("code is {:?}", kcontext);
+    let ctx = Krb5Context::new();
+//    let code = ctx.krb5_init_context();
+    println!("ctx is {:?}", ctx);
+//    println!("code is {:?}", code);
 }
