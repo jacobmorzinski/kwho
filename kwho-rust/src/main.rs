@@ -3,10 +3,6 @@
 // https://github.com/rust-lang/getopts
 extern crate getopts;
 
-// https://github.com/Kimundi/lazy-static.rs
-#[macro_use]
-extern crate lazy_static;
-
 use getopts::Options;
 use std::env;
 use std::io::{self,Write};
@@ -14,20 +10,42 @@ use std::process;
 
 // https://doc.rust-lang.org/1.0.0/book/ffi.html
 extern crate libc;
-use libc::{int32_t};
 
 #[allow(non_camel_case_types)]
-enum krb5_context {}            // internal/opaque
+pub mod ffi {
+    use libc::{int32_t};
 
-// typedef krb5_int32 krb5_error_code
-// typedef int32_t krb5_int32
+    pub type krb5_int32 = int32_t;
+    pub type krb5_error_code = krb5_int32;
 
-#[link(name="krb5")]
-extern {
-    fn krb5_init_context(context: *mut krb5_context) -> int32_t;
+    pub enum krb5_context {}            // internal/opaque
+
+    #[link(name="krb5")]
+    extern "C" {
+        pub fn krb5_init_context(context: *mut krb5_context) -> krb5_error_code;
+    }
+}
+
+#[derive(Debug)]
+pub struct Krb5Context {
+    ptr: *mut ffi::krb5_context,
+}
+
+impl Krb5Context {
+    pub fn new() -> Krb5Context {
+        Krb5Context {
+            "need to figure out how to pass a pointer to krb5_init_context "
+        }
+    }
 }
 
 
+// This is a silly amount of work, but I wanted to learn how to
+// get the progname into a global variable.
+// 
+// https://github.com/Kimundi/lazy-static.rs
+#[macro_use]
+extern crate lazy_static;
 lazy_static! {
     static ref PROGNAME: String = env::current_exe().unwrap() // PathBuf
         .file_name().unwrap()                                 // &OsStr
@@ -46,6 +64,17 @@ fn usage(opts: &Options) -> ! {
     println!("{}", opts.usage(&brief));
     process::exit(0);
 }
+
+
+// use libc::c_int;
+// // krb5_context from krb5-1.8.2/src/include/k5-int.h
+// #[repr(C)]
+// pub struct _krb5_context {
+//     // ...etc...
+//     pub ser_ctx_count: c_int,
+//     // ...etc...
+// }
+
 
 fn main() {
 // Debugging code:
@@ -73,7 +102,6 @@ fn main() {
         println!("ccache is {}", ccache.clone().unwrap());
     }
 
-    let kcontext = krb5_context;
-    let rv = krb5_init_context(kcontext);
-    println!("rv is {}", rv);
+    let kcontext = Krb5Context::new();
+    println!("code is {:?}", kcontext);
 }
