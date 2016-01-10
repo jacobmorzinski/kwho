@@ -5,6 +5,7 @@ extern crate getopts;
 
 use getopts::Options;
 use std::env;
+use std::ffi::CStr;
 use std::io::{self,Write};
 use std::process;
 use std::ptr;
@@ -161,9 +162,32 @@ fn main() {
     }
     println!("princ is {:?}", princ);
 
-    println!("princ length is {:?}", unsafe{(*princ).length});
+    println!("princ.magic is {:?}", unsafe{(*princ).magic});
+    println!("princ.realm.magic is {:?}", unsafe{(*princ).realm.magic});
+    println!("princ.realm.length is {:?}", unsafe{(*princ).realm.length});
+    let slice = unsafe{ CStr::from_ptr((*princ).realm.data) };
+    println!("princ.realm.data is {:?}", slice);
 
-    println!("{:?}", unsafe{(*(*princ).data).data});
+    let d = unsafe{(*princ).data};
+    println!("princ.data is {:?}", d);
+    let len = unsafe{(*princ).length};
+    println!("princ.length is {:?}", len);
+    println!("princ._type is {:?}", unsafe{(*princ)._type});
+
+    let d1 = unsafe { CStr::from_ptr((*d).data) };
+    println!("princ.data.data is {:?}", d1);
+
+    if len > 1 {
+        let d2 = unsafe { CStr::from_ptr((*(*princ).data.offset(1)).data) };
+        println!("princ.data.data is {:?}", d2);
+    }
+
+
+//     println!("d1.magic is {:?}", unsafe{(*d1)});
+//     println!("d1.magic is {:?}", unsafe{(*(d1)});
+//     println!("d1.length is {:?}", d1.length);
+//     println!("d1.data is {:?}", d1.data);
+
 
 //    #define krb5_princ_size(context, princ) (princ)->length
 //

@@ -12,6 +12,10 @@ https://doc.rust-lang.org/book/ffi.html
 
 https://doc.rust-lang.org/book/raw-pointers.html
 
+http://stackoverflow.com/questions/24145823/rust-ffi-c-string-handling
+
+http://stackoverflow.com/questions/24759028/how-should-you-do-pointer-arithmetic-in-rust
+
 ## rust-bindgen
 
 Kerberos header krb5.h auto-converted to rust with `rust-bindgen`
