@@ -11,3 +11,12 @@ https://www.reddit.com/r/rust/comments/2fmvcy/rust_ffi_and_opaque_pointer_idiom/
 https://doc.rust-lang.org/book/ffi.html
 
 https://doc.rust-lang.org/book/raw-pointers.html
+
+## rust-bindgen
+
+Kerberos header krb5.h auto-converted to rust with `rust-bindgen`
+
+https://github.com/crabtw/rust-bindgen
+
+    bindgen `krb5-config --libs --cflags` -match krb5.h -o /tmp/krb5.rs /usr/include/krb5/krb5.h
+

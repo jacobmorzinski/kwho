@@ -9,40 +9,84 @@ use std::io::{self,Write};
 use std::process;
 use std::ptr;
 
-// https://doc.rust-lang.org/1.0.0/book/ffi.html
+// https://doc.rust-lang.org/stable/book/ffi.html
 extern crate libc;
 
-#[allow(non_camel_case_types)]
-pub mod ffi {
-    use libc::{int32_t};
-
-    pub type krb5_int32 = int32_t;
+#[allow(dead_code, non_camel_case_types)]
+pub mod krb5 {
+    pub type krb5_int32 = ::libc::c_int;
     pub type krb5_error_code = krb5_int32;
+    pub type krb5_magic = krb5_error_code;
 
-    pub enum _krb5_context {}            // internal/opaque
-
-    #[link(name="krb5")]
+    pub enum Struct__krb5_context { }
+    pub type krb5_context = *mut Struct__krb5_context;
+    #[link(name = "krb5")]
+    #[link(name = "k5crypto")]
+    #[link(name = "com_err")]
     extern "C" {
-        pub fn krb5_init_context(context: *mut _krb5_context) -> krb5_error_code;
+        pub fn krb5_init_context(context: *mut krb5_context)
+          -> krb5_error_code;
+        pub fn krb5_cc_default(context: krb5_context, ccache: *mut krb5_ccache)
+          -> krb5_error_code;
+        pub fn krb5_cc_get_principal(context: krb5_context, cache: krb5_ccache,
+                                     principal: *mut krb5_principal)
+          -> krb5_error_code;
+
     }
+
+    pub enum Struct__krb5_ccache { }
+    pub type krb5_ccache = *mut Struct__krb5_ccache;
+
+    #[repr(C)]
+    #[derive(Copy)]
+    pub struct Struct__krb5_data {
+        pub magic: krb5_magic,
+        pub length: ::libc::c_uint,
+        pub data: *mut ::libc::c_char,
+    }
+    impl ::std::clone::Clone for Struct__krb5_data {
+        fn clone(&self) -> Self { *self }
+    }
+    impl ::std::default::Default for Struct__krb5_data {
+        fn default() -> Self { unsafe { ::std::mem::zeroed() } }
+    }
+    pub type krb5_data = Struct__krb5_data;
+
+    #[repr(C)]
+    #[derive(Copy)]
+    pub struct Struct_krb5_principal_data {
+        pub magic: krb5_magic,
+        pub realm: krb5_data,
+        pub data: *mut krb5_data,
+        pub length: krb5_int32,
+        pub _type: krb5_int32,
+    }
+    impl ::std::clone::Clone for Struct_krb5_principal_data {
+        fn clone(&self) -> Self { *self }
+    }
+    impl ::std::default::Default for Struct_krb5_principal_data {
+        fn default() -> Self { unsafe { ::std::mem::zeroed() } }
+    }
+    pub type krb5_principal_data = Struct_krb5_principal_data;
+    pub type krb5_principal = *mut krb5_principal_data;
+
 }
 
-#[derive(Debug)]
-#[allow(raw_pointer_derive)]     // TODO: fix
-pub struct Krb5Context {
-    ctx: *mut ffi::_krb5_context
-}
-
-impl Krb5Context {
-    pub fn new() -> Krb5Context {
-        Krb5Context {
-            ctx: ptr::null_mut(),
-        }
-    }
-    pub fn krb5_init_context(&self) {
-        unsafe { ffi::krb5_init_context(self.ctx); }
-    }
-}
+// #[derive(Debug)]
+// struct Krb5Context {
+//     ctx: krb5::krb5_context,
+// }
+// 
+// impl Krb5Context {
+//     pub fn new() -> Krb5Context {
+//         Krb5Context {
+//             ctx: ptr::null_mut(),
+//         }
+//     }
+//     pub fn krb5_init_context(&self) {
+//         unsafe { krb5::krb5_init_context(self.ctx); }
+//     }
+// }
 
 
 // This is a silly amount of work, but I wanted to learn how to
@@ -70,17 +114,6 @@ fn usage(opts: &Options) -> ! {
     process::exit(0);
 }
 
-
-// use libc::c_int;
-// // krb5_context from krb5-1.8.2/src/include/k5-int.h
-// #[repr(C)]
-// pub struct _krb5_context {
-//     // ...etc...
-//     pub ser_ctx_count: c_int,
-//     // ...etc...
-// }
-
-
 fn main() {
 // Debugging code:
 //    println!("Progname is {}", *PROGNAME);
@@ -107,8 +140,36 @@ fn main() {
         println!("ccache is {}", ccache.clone().unwrap());
     }
 
-    let ctx = Krb5Context::new();
-//    let code = ctx.krb5_init_context();
+    let mut ctx: krb5::krb5_context = ptr::null_mut();
+    let mut code: krb5::krb5_error_code = unsafe { krb5::krb5_init_context(&mut ctx) };
+    if code != 0 {
+        panic!("Need better errors!");
+    }
     println!("ctx is {:?}", ctx);
-//    println!("code is {:?}", code);
+
+    let mut cache: krb5::krb5_ccache = ptr::null_mut();
+    code = unsafe {krb5::krb5_cc_default(ctx, &mut cache)};
+    if code != 0 {
+        panic!("Need better errors!");
+    }
+    println!("cache is {:?}", cache);
+
+    let mut princ: krb5::krb5_principal = ptr::null_mut();
+    code = unsafe { krb5::krb5_cc_get_principal(ctx, cache, &mut princ) };
+    if code != 0 {
+        panic!("Need better errors!");
+    }
+    println!("princ is {:?}", princ);
+
+    println!("princ length is {:?}", unsafe{(*princ).length});
+
+    println!("{:?}", unsafe{(*(*princ).data).data});
+
+//    #define krb5_princ_size(context, princ) (princ)->length
+//
+//    #define krb5_princ_component(context, princ,i)  \
+//    (((i) < krb5_princ_size(context, princ))    \
+//     ? (princ)->data + (i)                      \
+//     : NULL)
+
 }
