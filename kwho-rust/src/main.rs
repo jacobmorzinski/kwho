@@ -5,13 +5,24 @@ extern crate getopts;
 
 use getopts::Options;
 use std::env;
-use std::ffi::CStr;
+use std::ffi::{CStr,CString};
 use std::io::{self,Write};
 use std::process;
 use std::ptr;
 
 // https://doc.rust-lang.org/stable/book/ffi.html
 extern crate libc;
+
+#[allow(dead_code, non_camel_case_types)]
+pub mod com_err {
+    #[link(name = "krb5")]
+    #[link(name = "k5crypto")]
+    #[link(name = "com_err")]
+    extern "C" {
+        pub fn com_err(arg1: *const ::libc::c_char, arg2: ::libc::c_int,
+                       arg3: *const ::libc::c_char, ...) -> ();
+    }
+}
 
 #[allow(dead_code, non_camel_case_types)]
 pub mod krb5 {
@@ -73,23 +84,6 @@ pub mod krb5 {
 
 }
 
-// #[derive(Debug)]
-// struct Krb5Context {
-//     ctx: krb5::krb5_context,
-// }
-// 
-// impl Krb5Context {
-//     pub fn new() -> Krb5Context {
-//         Krb5Context {
-//             ctx: ptr::null_mut(),
-//         }
-//     }
-//     pub fn krb5_init_context(&self) {
-//         unsafe { krb5::krb5_init_context(self.ctx); }
-//     }
-// }
-
-
 // This is a silly amount of work, but I wanted to learn how to
 // get the progname into a global variable.
 // 
@@ -119,6 +113,7 @@ fn main() {
 // Debugging code:
 //    println!("Progname is {}", *PROGNAME);
 
+    let progname = (*PROGNAME).clone();
 
     let args: Vec<String> = env::args().collect();
     let mut opts = Options::new();
@@ -138,62 +133,51 @@ fn main() {
     let ccache: Option<String> = matches.opt_str("c");
 // Debugging code:
     if ccache.is_some() {
-        println!("ccache is {}", ccache.clone().unwrap());
+        // println!("Sorry, IGNORING requested ccache ({})", ccache.clone().unwrap());
     }
 
     let mut ctx: krb5::krb5_context = ptr::null_mut();
     let mut code: krb5::krb5_error_code = unsafe { krb5::krb5_init_context(&mut ctx) };
     if code != 0 {
-        panic!("Need better errors!");
+        unsafe {
+            com_err::com_err(CString::new(progname).unwrap().into_raw(),
+                             code,
+                             CString::new("while initializing krb5").unwrap().into_raw());
+        }
+        std::process::exit(1);
     }
-    println!("ctx is {:?}", ctx);
 
     let mut cache: krb5::krb5_ccache = ptr::null_mut();
     code = unsafe {krb5::krb5_cc_default(ctx, &mut cache)};
     if code != 0 {
-        panic!("Need better errors!");
+        unsafe {
+            com_err::com_err(CString::new(progname).unwrap().into_raw(),
+                             code,
+                             CString::new("while getting default ccache").unwrap().into_raw());
+        }
+        std::process::exit(1);
     }
-    println!("cache is {:?}", cache);
 
     let mut princ: krb5::krb5_principal = ptr::null_mut();
     code = unsafe { krb5::krb5_cc_get_principal(ctx, cache, &mut princ) };
     if code != 0 {
-        panic!("Need better errors!");
+        unsafe {
+            com_err::com_err(CString::new(progname).unwrap().into_raw(),
+                             code,
+                             CString::new("while retrieving principal name").unwrap().into_raw());
+        }
+        std::process::exit(1);
     }
-    println!("princ is {:?}", princ);
 
-    println!("princ.magic is {:?}", unsafe{(*princ).magic});
-    println!("princ.realm.magic is {:?}", unsafe{(*princ).realm.magic});
-    println!("princ.realm.length is {:?}", unsafe{(*princ).realm.length});
-    let slice = unsafe{ CStr::from_ptr((*princ).realm.data) };
-    println!("princ.realm.data is {:?}", slice);
-
-    let d = unsafe{(*princ).data};
-    println!("princ.data is {:?}", d);
     let len = unsafe{(*princ).length};
-    println!("princ.length is {:?}", len);
-    println!("princ._type is {:?}", unsafe{(*princ)._type});
 
-    let d1 = unsafe { CStr::from_ptr((*d).data) };
-    println!("princ.data.data is {:?}", d1);
+    let d = unsafe { CStr::from_ptr((*(*princ).data).data).to_string_lossy() };
+    print!("{}", d);
 
-    if len > 1 {
-        let d2 = unsafe { CStr::from_ptr((*(*princ).data.offset(1)).data) };
-        println!("princ.data.data is {:?}", d2);
+    for i in 1..len {
+        let d2 = unsafe { CStr::from_ptr((*(*princ).data.offset(i as isize)).data).to_string_lossy() };
+        print!("/{}", d2);
     }
-
-
-//     println!("d1.magic is {:?}", unsafe{(*d1)});
-//     println!("d1.magic is {:?}", unsafe{(*(d1)});
-//     println!("d1.length is {:?}", d1.length);
-//     println!("d1.data is {:?}", d1.data);
-
-
-//    #define krb5_princ_size(context, princ) (princ)->length
-//
-//    #define krb5_princ_component(context, princ,i)  \
-//    (((i) < krb5_princ_size(context, princ))    \
-//     ? (princ)->data + (i)                      \
-//     : NULL)
+    println!("");
 
 }

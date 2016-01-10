@@ -16,6 +16,8 @@ http://stackoverflow.com/questions/24145823/rust-ffi-c-string-handling
 
 http://stackoverflow.com/questions/24759028/how-should-you-do-pointer-arithmetic-in-rust
 
+https://www.reddit.com/r/rust/comments/2sa4lc/char_to_rust_vecstr_u32_and_u64_array_pointer/
+
 ## rust-bindgen
 
 Kerberos header krb5.h auto-converted to rust with `rust-bindgen`
