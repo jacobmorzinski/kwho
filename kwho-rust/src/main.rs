@@ -101,14 +101,18 @@ fn main() {
         std::process::exit(1);
     }
 
-    let len = unsafe{(*princ).length};
 
-    let d = unsafe { CStr::from_ptr((*(*princ).data).data).to_string_lossy() };
-    print!("{}", d);
+    let kpd = unsafe{(*princ)};
+    let len = kpd.length;
+
+    let d = unsafe { (*kpd.data).data };
+    let s = unsafe { CStr::from_ptr(d).to_string_lossy() };
+    print!("{}", s);
 
     for i in 1..len {
-        let d2 = unsafe { CStr::from_ptr((*(*princ).data.offset(i as isize)).data).to_string_lossy() };
-        print!("/{}", d2);
+        let d = unsafe { (*kpd.data.offset(i as isize)).data };
+        let s = unsafe { CStr::from_ptr(d).to_string_lossy() };
+        print!("/{}", s);
     }
     println!("");
 
