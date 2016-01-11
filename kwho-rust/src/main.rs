@@ -33,7 +33,7 @@ impl Krb5Context {
                     .unwrap().into_raw();
                 let detail = CString::new("while initializing krb5")
                     .unwrap().into_raw();
-                com_err::com_err(whoami, code as i64, detail);
+                com_err::com_err(whoami, code as libc::c_long, detail);
                 return None;
             }
         }
@@ -54,7 +54,7 @@ impl Krb5Cache {
                     .unwrap().into_raw();
                 let detail = CString::new("while getting default ccache")
                     .unwrap().into_raw();
-                com_err::com_err(whoami, code as i64, detail);
+                com_err::com_err(whoami, code as libc::c_long, detail);
                 return None;
             }
         }
@@ -77,7 +77,7 @@ impl Krb5Princ {
                     .unwrap().into_raw();
                 let detail = CString::new("while retrieving principal name")
                     .unwrap().into_raw();
-                com_err::com_err(whoami, code as i64, detail);
+                com_err::com_err(whoami, code as libc::c_long, detail);
                 return None;
             }
         }
