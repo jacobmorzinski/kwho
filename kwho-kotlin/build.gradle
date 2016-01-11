@@ -1,4 +1,6 @@
-// vim:shiftwidth=4:tabstop=4:expandtab:filetype=groovy
+// You can build with "./gradlew" (or "gradlew.bat")
+// For more information about Gradle see
+// https://docs.gradle.org/current/userguide/userguide.html
 
 buildscript {
     ext.kotlin_version = '1.0.0-beta-4584'
@@ -13,13 +15,11 @@ buildscript {
     }
 }
 
-// creates tasks including: shadowJar, installShadowApp
 plugins {
+    id 'kotlin'
+    id 'application'
     id 'com.github.johnrengelman.shadow' version '1.2.2'
 }
-
-apply plugin: 'kotlin'
-apply plugin: 'application'
 
 mainClassName = 'demo.KwhoKt'
 
@@ -53,3 +53,5 @@ task wrapper(type: Wrapper) {
     // source code to help with code completion.
     distributionUrl="https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
+
+// vim:shiftwidth=4:tabstop=4:expandtab:filetype=groovy

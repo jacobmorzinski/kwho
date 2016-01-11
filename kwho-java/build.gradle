@@ -1,25 +1,28 @@
-// vim:shiftwidth=4:tabstop=4:expandtab:filetype=groovy
+// You can build with "./gradlew" (or "gradlew.bat")
+// For more information about Gradle see
+// https://docs.gradle.org/current/userguide/userguide.html
 
-// creates tasks including: shadowJar, installShadowApp
 plugins {
-    id 'java' // or 'groovy' Must be explicitly applied
+    id 'java'
+    id 'application'
     id 'com.github.johnrengelman.shadow' version '1.2.2'
 }
 
-apply plugin: 'java'
-
-// creates tasks including: startScripts, installDist
-apply plugin: 'application'
 mainClassName = 'kwho'
 
+defaultTasks 'run'
+
+run {
+    if (project.hasProperty("args")) {
+        args project.args.split('\\s+')
+    }
+}
+
 repositories {
-    // You can declare any Maven/Ivy/file repository here.
     jcenter()
 }
 
 dependencies {
-    // compile 'org.slf4j:slf4j-api:1.7.13'
-
     testCompile 'junit:junit:4.12'
 }
 
@@ -33,3 +36,5 @@ task wrapper(type: Wrapper) {
     // source code to help with code completion.
     distributionUrl="https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
+
+// vim:shiftwidth=4:tabstop=4:expandtab:filetype=groovy
