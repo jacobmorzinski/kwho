@@ -3,7 +3,6 @@
 // https://github.com/rust-lang/getopts
 extern crate getopts;
 
-// https://doc.rust-lang.org/stable/book/ffi.html
 extern crate libc;
 
 // Rust FFI for:
@@ -32,8 +31,8 @@ impl Krb5Context {
             if code != 0 {
                 let whoami = CString::new((*PROGNAME).clone())
                     .unwrap().into_raw();
-                let detail = CString::new("while initializing krb5").
-                    unwrap().into_raw();
+                let detail = CString::new("while initializing krb5")
+                    .unwrap().into_raw();
                 com_err::com_err(whoami, code as i64, detail);
                 return None;
             }
@@ -41,6 +40,72 @@ impl Krb5Context {
         Some(Krb5Context { ctx: ctx, })
     }
 }
+
+pub struct Krb5Cache {
+    cache: krb5::krb5_ccache,
+}
+impl Krb5Cache {
+    pub fn get(ctx: &Krb5Context) -> Option<Krb5Cache> {
+        let mut cache: krb5::krb5_ccache = ptr::null_mut();
+        unsafe {
+            let code = krb5::krb5_cc_default(ctx.ctx, &mut cache);
+            if code != 0 {
+                let whoami = CString::new((*PROGNAME).clone())
+                    .unwrap().into_raw();
+                let detail = CString::new("while getting default ccache")
+                    .unwrap().into_raw();
+                com_err::com_err(whoami, code as i64, detail);
+                return None;
+            }
+        }
+        Some(Krb5Cache { cache: cache, })
+    }
+}
+
+pub struct Krb5Princ {
+    princ: krb5::krb5_principal,
+}
+impl Krb5Princ {
+    pub fn get(ctx: &Krb5Context, cache: &Krb5Cache) -> Option<Krb5Princ> {
+        let mut princ: krb5::krb5_principal = ptr::null_mut();
+        unsafe {
+            let code = krb5::krb5_cc_get_principal(ctx.ctx,
+                                                   cache.cache,
+                                                   &mut princ);
+            if code != 0 {
+                let whoami = CString::new((*PROGNAME).clone())
+                    .unwrap().into_raw();
+                let detail = CString::new("while retrieving principal name")
+                    .unwrap().into_raw();
+                com_err::com_err(whoami, code as i64, detail);
+                return None;
+            }
+        }
+        Some(Krb5Princ { princ: princ, })
+    }
+    pub fn realm(&self) -> String {
+        let kp = unsafe { *self.princ };
+        let d = kp.realm.data;
+        let s = unsafe { CStr::from_ptr(d).to_string_lossy() };
+        s.into_owned()
+    }
+    pub fn data(&self) -> String {
+        let kp = unsafe { *self.princ };
+        let len = kp.length;
+
+        // Pointer offset arithmetic
+        // C code is: krb5_principal->(data+(i))->data
+        (0..len).map(
+            |i|
+            unsafe{
+                CStr::from_ptr((*kp.data.offset(i as isize)).data)
+                    .to_string_lossy()
+            })
+            .collect::<Vec<_>>()
+            .join("/")
+    }
+}
+
 
 // This is a silly amount of work, but I wanted to learn how to
 // get the progname into a global variable.
@@ -69,10 +134,6 @@ fn usage(opts: &Options) -> ! {
 
 fn main() {
 
-    let progname = CString::new((*PROGNAME).clone())
-        .unwrap()
-        .into_raw();
-
     let args: Vec<String> = env::args().collect();
     let mut opts = Options::new();
     opts.optflag("h", "help", "print this help menu");
@@ -87,45 +148,9 @@ fn main() {
         usage(&opts);
     }
     
-    let mut code: krb5::krb5_error_code;
+    let k5ctx = Krb5Context::new().unwrap();
+    let k5cache = Krb5Cache::get(&k5ctx).unwrap();
+    let k5princ = Krb5Princ::get(&k5ctx, &k5cache).unwrap();
 
-    let ctx = Krb5Context::new().unwrap().ctx;
-
-    let mut cache: krb5::krb5_ccache = ptr::null_mut();
-    code = unsafe {krb5::krb5_cc_default(ctx, &mut cache)};
-    if code != 0 {
-        unsafe {
-            com_err::com_err(progname,
-                             code as i64,
-                             CString::new("while getting default ccache").unwrap().into_raw());
-        }
-        std::process::exit(1);
-    }
-
-    let mut princ: krb5::krb5_principal = ptr::null_mut();
-    code = unsafe { krb5::krb5_cc_get_principal(ctx, cache, &mut princ) };
-    if code != 0 {
-        unsafe {
-            com_err::com_err(progname,
-                             code as i64,
-                             CString::new("while retrieving principal name").unwrap().into_raw());
-        }
-        std::process::exit(1);
-    }
-
-
-    let kpd = unsafe{(*princ)};
-    let len = kpd.length;
-
-    let d = unsafe { (*kpd.data).data };
-    let s = unsafe { CStr::from_ptr(d).to_string_lossy() };
-    print!("{}", s);
-
-    for i in 1..len {
-        let d = unsafe { (*kpd.data.offset(i as isize)).data };
-        let s = unsafe { CStr::from_ptr(d).to_string_lossy() };
-        print!("/{}", s);
-    }
-    println!("");
-
+    println!("{}", k5princ.data());
 }
