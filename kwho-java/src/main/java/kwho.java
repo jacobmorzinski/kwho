@@ -9,6 +9,7 @@ public class kwho {
 
         String cache = System.getenv("KRB5CCNAME");
         if (cache == null) {
+            System.err.println("Uh-oh, KRB5CCNAME is not set.  Quitting.");
             return;
         }
 
