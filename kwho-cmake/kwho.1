@@ -1,0 +1,57 @@
+.\" kwho.M
+.\"
+.\" "
+.TH KWHO 1
+.SH NAME
+kwho \- print Kerberos principal name
+.SH SYNOPSIS
+\fBkwho\fP [\fB\-5\fP] [\fB\-4\fP] [\fIcache_name\fP]
+.br
+.SH DESCRIPTION
+.I Kwho
+prints the Kerberos principal credentials cache.  The default
+behavior is to list Kerberos 5 credentials. If kwho was built
+with Kerberos 4 support, Kerberos 4 credentials may be selected
+with the command-line option.
+.SH OPTIONS
+.TP
+.B \-5
+list Kerberos 5 credentials.  This overrides whatever the default built-in
+behavior may be.  This option may be used with
+.B \-4
+.
+.TP
+.B \-4
+list Kerberos 4 credentials.  This overrides whatever the default built-in
+behavior may be.  This option is only available if kinit was built
+with Kerberos 4 compatibility.  This option may be used with 
+.B \-5
+.
+.PP
+If
+.I cache_name
+is not specified, kwho will display the credentials in the default
+credentials cache or keytab file as appropriate.  If the
+.B KRB5CCNAME
+environment variable is set, its value is used to name the default
+ticket cache.
+.SH ENVIRONMENT
+.B Kwho
+uses the following environment variables:
+.TP "\w'.SM KRB5CCNAME\ \ 'u"
+.SM KRB5CCNAME
+Location of the Kerberos 5 credentials (ticket) cache.
+.TP "\w'.SM KRBTKFILE\ \ 'u"
+.SM KRBTKFILE
+Filename of the Kerberos 4 credentials (ticket) cache.
+.SH FILES
+.TP "\w'/tmp/krb5cc_[uid]\ \ 'u"
+/tmp/krb5cc_[uid]
+default location of Kerberos 5 credentials cache 
+([uid] is the decimal UID of the user).
+.TP "\w'/tmp/tkt[uid]\ \ 'u"
+/tmp/tkt[uid]
+default location of Kerberos 4 credentials cache 
+([uid] is the decimal UID of the user).
+.SH SEE ALSO
+klist(1), krb5(3)
